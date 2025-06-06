@@ -24,7 +24,7 @@ const Navbar = () => {
       {
         user && <> 
         <NavLink to="/myApplications">
-          <a>My Applications</a>
+          <a className="ml-5">My Applications</a>
         </NavLink>
         </>
       }
