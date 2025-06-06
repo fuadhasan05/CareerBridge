@@ -1,11 +1,43 @@
-import React from 'react';
+import React from "react";
+import { Link, useParams } from "react-router";
+import useAuth from "../hocks/useAuth";
 
 const JobApply = () => {
-    return (
-        <div>
-            Job Apply page
-        </div>
-    );
+  const { id: jobId } = useParams();
+  const { user } = useAuth();
+
+  console.log(jobId, user);
+
+  const handleApplyFormSubmit = e => {
+    e.preventDefault();
+    const form = e.target;
+    const linkedIn = form.linkedIn.value;
+    const github = form.github.value;
+    const resume = form.resume.value;
+
+    console.log(linkedIn, github, resume);
+  }
+
+  return (
+    <div className="my-10">
+      <h3 className="text-4xl mb-5">Apply For this job:<Link to={`/jobs/${jobId}`}> details</Link> </h3>
+      <form onSubmit={handleApplyFormSubmit}>
+        <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
+          
+          <label className="label">LinkedIn Link</label>
+          <input type="url" name="linkedIn" className="input" placeholder="LinkedIn profile link" />
+
+          <label className="label">Github Link</label>
+          <input type="url" name="github" className="input" placeholder="Github Profile Link" />
+
+          <label className="label">Resume Link</label>
+          <input type="url" name="resume" className="input" placeholder="Resume Link" />
+
+          <input type="submit" name="btn" id="" className="btn" />
+        </fieldset>
+      </form>
+    </div>
+  );
 };
 
 export default JobApply;
