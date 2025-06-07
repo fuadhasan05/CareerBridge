@@ -7,13 +7,13 @@ const Navbar = () => {
 
   const handleSignOut = () => {
     signOutUser()
-    .then(() => {
-      console.log('signed out user');
-    })
-    .catch(error =>{
-      console.log(error);
-    })
-  }
+      .then(() => {
+        console.log("signed out user");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const links = (
     <>
@@ -21,14 +21,24 @@ const Navbar = () => {
         <a>Home</a>
       </NavLink>
 
-      {
-        user && <> 
-        <NavLink to="/myApplications">
-          <a className="ml-5">My Applications</a>
-        </NavLink>
+      {/* for applicant */}
+      {user && (
+        <>
+          <NavLink to="/myApplications">
+            <a className="ml-5">My Applications</a>
+          </NavLink>
         </>
+      )}
+
+      {/* for recruiter */}
+      {
+        user && <>
+         <NavLink to="/addJob">
+            <a className="ml-5">Add Job</a>
+          </NavLink>
+         </>
       }
-       </>
+    </>
   );
 
   return (
@@ -67,7 +77,9 @@ const Navbar = () => {
         </div>
         <div className="navbar-end">
           {user ? (
-            <button onClick={handleSignOut} className="btn">Sign Out</button>
+            <button onClick={handleSignOut} className="btn">
+              Sign Out
+            </button>
           ) : (
             <>
               <NavLink className="btn" to="/register">
