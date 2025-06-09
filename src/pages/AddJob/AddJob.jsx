@@ -1,12 +1,64 @@
 import React from "react";
+import useAuth from "../../hocks/useAuth";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const AddJob = () => {
+  const { user } = useAuth();
+
+  const handleAddAJob = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    // Validate salary range
+    const { minSalary, maxSalary, currency, ...newJob } = data;
+    newJob.salaryRange = { minSalary, maxSalary, currency };
+
+    // prepare the job data
+    const requrementsString = newJob.requirements;
+    const requrementsDirty = requrementsString.split(",");
+    const requirementsCleaned = requrementsDirty.map((req) => req.trim());
+    newJob.requirements = requirementsCleaned;
+
+    //
+    newJob.responsibilities = newJob.responsibilities
+      .split(",")
+      .map((resp) => resp.trim());
+
+    newJob.status = "active";
+
+    console.log(newJob);
+
+    // save job to the database
+    axios
+      .post("http://localhost:3000/job", newJob)
+      .then((res) => {
+        if (res.data.insertedId) {
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "Your Job has been saved",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
       <h2 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-gray-100">
         Add a New Job
       </h2>
-      <form className="space-y-8 bg-white dark:bg-gray-900 shadow-lg rounded-xl p-8">
+      <form
+        onSubmit={handleAddAJob}
+        className="space-y-8 bg-white dark:bg-gray-900 shadow-lg rounded-xl p-8"
+      >
         {/* Basic Info */}
         <fieldset>
           <legend className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
@@ -15,15 +67,13 @@ const AddJob = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label
-                htmlFor="jobTitle"
                 className="block mb-1 font-medium text-gray-700 dark:text-gray-300"
               >
                 Job Title
               </label>
               <input
                 type="text"
-                id="jobTitle"
-                name="jobTitle"
+                name="title"
                 placeholder="e.g. Frontend Developer"
                 className="input input-bordered w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
                 required
@@ -31,15 +81,13 @@ const AddJob = () => {
             </div>
             <div>
               <label
-                htmlFor="companyName"
                 className="block mb-1 font-medium text-gray-700 dark:text-gray-300"
               >
                 Company Name
               </label>
               <input
                 type="text"
-                id="companyName"
-                name="companyName"
+                name="company"
                 placeholder="e.g. Google"
                 className="input input-bordered w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
                 required
@@ -47,15 +95,13 @@ const AddJob = () => {
             </div>
             <div>
               <label
-                htmlFor="companyLocation"
                 className="block mb-1 font-medium text-gray-700 dark:text-gray-300"
               >
                 Location
               </label>
               <input
                 type="text"
-                id="companyLocation"
-                name="companyLocation"
+                name="location"
                 placeholder="e.g. San Francisco, CA"
                 className="input input-bordered w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
                 required
@@ -63,15 +109,13 @@ const AddJob = () => {
             </div>
             <div>
               <label
-                htmlFor="companyLogo"
                 className="block mb-1 font-medium text-gray-700 dark:text-gray-300"
               >
                 Company Logo URL
               </label>
               <input
                 type="url"
-                id="companyLogo"
-                name="companyLogo"
+                name="company_logo"
                 placeholder="https://logo.com/logo.png"
                 className="input input-bordered w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
               />
@@ -106,7 +150,7 @@ const AddJob = () => {
             Job Category
           </legend>
           <select
-            name="jobCategory"
+            name="category"
             className="select select-bordered w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
             required
           >
@@ -125,7 +169,7 @@ const AddJob = () => {
           </legend>
           <input
             type="date"
-            name="deadline"
+            name="applicationDeadline"
             className="input input-bordered w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
             required
           />
@@ -139,41 +183,34 @@ const AddJob = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label
-                htmlFor="minSalary"
                 className="block mb-1 font-medium text-gray-700 dark:text-gray-300"
               >
                 Minimum Salary
               </label>
               <input
                 type="number"
-                id="minSalary"
-                name="minSalary"
+                name="min"
                 className="input input-bordered w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
                 placeholder="e.g. 50000"
-                min="0"
                 required
               />
             </div>
             <div>
               <label
-                htmlFor="maxSalary"
                 className="block mb-1 font-medium text-gray-700 dark:text-gray-300"
               >
                 Maximum Salary
               </label>
               <input
                 type="number"
-                id="maxSalary"
-                name="maxSalary"
+                name="max"
                 className="input input-bordered w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
                 placeholder="e.g. 120000"
-                min="0"
                 required
               />
             </div>
             <div>
               <label
-                htmlFor="currency"
                 className="block mb-1 font-medium text-gray-700 dark:text-gray-300"
               >
                 Currency
@@ -243,31 +280,27 @@ const AddJob = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label
-                htmlFor="hrName"
                 className="block mb-1 font-medium text-gray-700 dark:text-gray-300"
               >
                 HR Name
               </label>
               <input
                 type="text"
-                id="hrName"
-                name="hrName"
+                name="hr_name"
                 className="input input-bordered w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
                 placeholder="e.g. John Doe"
                 required
               />
             </div>
             <div>
-              <label
-                htmlFor="hrEmail"
-                className="block mb-1 font-medium text-gray-700 dark:text-gray-300"
-              >
+              <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">
                 HR Email
               </label>
               <input
                 type="email"
                 id="hrEmail"
-                name="hrEmail"
+                name="hr_email"
+                defaultValue={user.email}
                 className="input input-bordered w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
                 placeholder="e.g. hr@company.com"
                 required
